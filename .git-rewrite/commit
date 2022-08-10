@@ -1,0 +1,9 @@
+tree bb736d50841a2f102b103c0768c9b4f623e32a09
+parent 45d0c89e9aaba2b334841ee29266e940638f9873
+parent d879ef0f155afca4483b2ddb9454bba668258b3b
+author C. T. Lin <chentsulin@gmail.com> 1446871591 +0800
+committer C. T. Lin <chentsulin@gmail.com> 1446871591 +0800
+
+Merge pull request #68 from chentsulin/bump-style-n-css-loader
+
+Bump style n css loader
