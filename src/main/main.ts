@@ -91,9 +91,10 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1380,
-    height: 800,
+    width: isDebug ? 1380 : 375,
+    height: isDebug ? 800 : 400,
     icon: getAssetPath('icon.png'),
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
@@ -104,7 +105,7 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html', { host: loadIP }));
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
