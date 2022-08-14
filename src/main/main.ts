@@ -17,6 +17,7 @@ import { PeerServer } from 'peer';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
+app.commandLine.appendSwitch('ignore-certificate-errors');
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -27,19 +28,22 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+function getLocalIP() {
+  return (
+    Object.values(OS.networkInterfaces())
+      .find((network) =>
+        network?.find(
+          (item) => item.family === 'IPv4' && item.address !== '127.0.0.1'
+        )
+      )
+      ?.find((item) => item.family === 'IPv4' && item.address !== '127.0.0.1')
+      ?.address || ''
+  );
+}
+
+const loadIP = getLocalIP();
 ipcMain.on('getIP', async (event) => {
-  function getLocalIP() {
-    const netInterFace = OS.networkInterfaces();
-    return Object.values(netInterFace).find((network) => {
-      return network?.find(
-        (item) =>
-          item.family === 'IPv4' &&
-          item.address !== '127.0.0.1' &&
-          item.address !== '192.168.137.1'
-      );
-    })?.[0].address;
-  }
-  event.reply('getIP', getLocalIP());
+  event.reply('getIP', loadIP);
 });
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -72,7 +76,6 @@ const createWindow = async () => {
   }
   const peerServer = PeerServer({ port: 19527, path: '/' });
   peerServer.on('connection', (client) => {
-    console.log(client, client.getId());
     const notification = new Notification();
     notification.title = `${client.getId()}成功连接`;
     notification.show();
@@ -92,13 +95,16 @@ const createWindow = async () => {
     height: 800,
     icon: getAssetPath('icon.png'),
     webPreferences: {
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
+      webSecurity: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(resolveHtmlPath('index.html', { host: loadIP }));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
