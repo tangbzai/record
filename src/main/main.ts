@@ -74,7 +74,7 @@ const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
-  const peerServer = PeerServer({ port: 19527, path: '/' });
+  const peerServer = PeerServer({ port: 5145, path: '/' });
   peerServer.on('connection', (client) => {
     const notification = new Notification();
     notification.title = `${client.getId()}成功连接`;

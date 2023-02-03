@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Peer from 'peerjs';
 import './App.css';
@@ -8,17 +8,63 @@ const { electron } = window;
 
 const IPC = electron.ipcRenderer;
 let InputValue = '';
+
 const Hello = () => {
   const [localIP, setLocalIP] = useState('');
+  const streamRef = useRef<MediaStream>();
+
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+          },
+        },
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+          },
+        },
+      } as any)
+      .then((stream: MediaStream) => {
+        stream.removeTrack(stream.getVideoTracks()[0]);
+        streamRef.current = stream;
+        return true;
+      })
+      .catch((e) => {
+        console.error('getSources Error:', e);
+        showToast({ title: `getSources Error: ${e}` });
+      });
+  }, []);
 
   const connect = useCallback(
-    (host: string = localIP) => {
+    (host: string) => {
       if (!host) return undefined;
       const peer = new Peer(`${localIP.replace(/\./g, '-')}`, {
         host,
-        port: 19527,
+        port: 5145,
         path: '/',
       });
+      return peer;
+    },
+    [localIP]
+  );
+
+  useEffect(() => {
+    const peer = connect(localIP);
+    if (!peer) {
+      showToast({ title: `出现错误： 连接 本地 peer 失败` });
+    }
+  }, [connect, localIP]);
+
+  const startConnect = useCallback(
+    (targetIP: string) => {
+      const peer = connect(targetIP);
+      if (!peer) {
+        showToast({ title: `出现错误： peer 获取失败` });
+        return;
+      }
       peer.on('connection', (conn) => {
         showToast({ title: '连接成功' });
         conn.on('data', (data) => {
@@ -38,41 +84,11 @@ const Hello = () => {
       peer.on('error', (err) => {
         showToast({ title: `出现错误：${err}` });
       });
-      return peer;
-    },
-    [localIP]
-  );
-
-  const startConnect = useCallback(
-    (targetIP: string) => {
-      function handleStream(stream: MediaStream) {
-        console.log(stream);
-        // 移除视频轨道
-        stream.removeTrack(stream.getVideoTracks()[0]);
-        const peer = connect(targetIP);
-        peer?.call(targetIP.replace(/\./g, '-'), stream);
+      if (!streamRef.current) {
+        showToast({ title: `出现错误： streamRef.current 为空` });
+        return;
       }
-
-      function handleError(e: any) {
-        console.error('getSources Error:', e);
-        showToast({ title: `getSources Error: ${e}` });
-      }
-
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-            },
-          },
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-            },
-          },
-        })
-        .then(handleStream)
-        .catch(handleError);
+      peer?.call(targetIP.replace(/\./g, '-'), streamRef.current);
     },
     [connect]
   );
@@ -83,14 +99,8 @@ const Hello = () => {
       setLocalIP(LocalIP as string);
     });
     IPC.sendMessage('getIP', []);
-    IPC.on('SET_SOURCE', (arg) => {
-      console.log('SET_SOURCE', arg);
-    });
   }, []);
 
-  useEffect(() => {
-    connect();
-  }, [connect]);
   return (
     <div className="app">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
