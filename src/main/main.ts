@@ -98,6 +98,7 @@ const createWindow = async () => {
     webPreferences: {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
+      allowRunningInsecureContent: true,
       webSecurity: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')

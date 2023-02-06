@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import Peer from 'peerjs';
 import './App.css';
@@ -11,32 +11,6 @@ let InputValue = '';
 
 const Hello = () => {
   const [localIP, setLocalIP] = useState('');
-  const streamRef = useRef<MediaStream>();
-
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-          },
-        },
-        video: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-          },
-        },
-      } as any)
-      .then((stream: MediaStream) => {
-        stream.removeTrack(stream.getVideoTracks()[0]);
-        streamRef.current = stream;
-        return true;
-      })
-      .catch((e) => {
-        console.error('getSources Error:', e);
-        showToast({ title: `getSources Error: ${e}` });
-      });
-  }, []);
 
   const connect = useCallback(
     (host: string) => {
@@ -52,10 +26,22 @@ const Hello = () => {
   );
 
   useEffect(() => {
+    if (!connect || !localIP) return;
     const peer = connect(localIP);
     if (!peer) {
       showToast({ title: `出现错误： 连接 本地 peer 失败` });
+      return;
     }
+    peer.on('call', (call) => {
+      call.answer(undefined);
+      call.on('stream', (stream) => {
+        showToast({ title: '接收到stream' });
+        const audio = document.querySelector('audio');
+        if (!audio) return;
+        audio.srcObject = stream;
+        audio.onloadedmetadata = () => audio.play();
+      });
+    });
   }, [connect, localIP]);
 
   const startConnect = useCallback(
@@ -84,18 +70,34 @@ const Hello = () => {
       peer.on('error', (err) => {
         showToast({ title: `出现错误：${err}` });
       });
-      if (!streamRef.current) {
-        showToast({ title: `出现错误： streamRef.current 为空` });
-        return;
-      }
-      peer?.call(targetIP.replace(/\./g, '-'), streamRef.current);
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+            },
+          },
+          video: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+            },
+          },
+        } as any)
+        .then((stream: MediaStream) => {
+          stream.removeTrack(stream.getVideoTracks()[0]);
+          peer.call(targetIP.replace(/\./g, '-'), stream);
+          return true;
+        })
+        .catch((e) => {
+          console.error('getSources Error:', e);
+          showToast({ title: `getSources Error: ${e}` });
+        });
     },
     [connect]
   );
 
   useEffect(() => {
     IPC.once('getIP', (LocalIP) => {
-      console.log(LocalIP);
       setLocalIP(LocalIP as string);
     });
     IPC.sendMessage('getIP', []);
@@ -139,7 +141,6 @@ const Hello = () => {
           type="button"
           onClick={() => {
             showToast({ title: '开始建立连接' });
-            // connect(InputValue);
             startConnect(InputValue);
           }}
         >
