@@ -4,7 +4,6 @@ import showToast from '../utils/showToast';
 import './Index.css';
 
 const { electron } = window;
-const IPC = electron.ipcRenderer;
 let InputValue = '';
 
 export default function Index() {
@@ -95,6 +94,7 @@ export default function Index() {
   );
 
   useEffect(() => {
+    const IPC = electron.ipcRenderer;
     IPC.once('getIP', (LocalIP) => {
       setLocalIP(LocalIP as string);
     });
