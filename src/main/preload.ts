@@ -5,7 +5,7 @@ import {
   IpcRendererEvent,
 } from 'electron';
 
-export type Channels = 'connect' | 'getIP';
+export type Channels = 'connect' | 'getIP' | 'winHide';
 
 const IPC = {
   sendMessage(channel: Channels, args: unknown[]) {
