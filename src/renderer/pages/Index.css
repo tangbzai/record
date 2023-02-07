@@ -1,0 +1,17 @@
+.index {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 20px auto;
+  width: 300px;
+  font-size: 1.3rem;
+}

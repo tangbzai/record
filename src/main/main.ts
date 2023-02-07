@@ -9,7 +9,15 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, Notification } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  Notification,
+  Tray,
+  Menu,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import OS from 'os';
@@ -17,6 +25,7 @@ import { PeerServer } from 'peer';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
+app.commandLine.appendSwitch('ignore-certificate-errors');
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -26,21 +35,30 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
 
+function getLocalIP() {
+  return (
+    Object.values(OS.networkInterfaces())
+      .find((network) =>
+        network?.find(
+          (item) => item.family === 'IPv4' && item.address !== '127.0.0.1'
+        )
+      )
+      ?.find((item) => item.family === 'IPv4' && item.address !== '127.0.0.1')
+      ?.address || ''
+  );
+}
+
+const loadIP = getLocalIP();
 ipcMain.on('getIP', async (event) => {
-  function getLocalIP() {
-    const netInterFace = OS.networkInterfaces();
-    return Object.values(netInterFace).find((network) => {
-      return network?.find(
-        (item) =>
-          item.family === 'IPv4' &&
-          item.address !== '127.0.0.1' &&
-          item.address !== '192.168.137.1'
-      );
-    })?.[0].address;
-  }
-  event.reply('getIP', getLocalIP());
+  event.reply('getIP', loadIP);
 });
+
+ipcMain.on('winHide', () => {
+  if (mainWindow) mainWindow.hide();
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -70,9 +88,8 @@ const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
-  const peerServer = PeerServer({ port: 19527, path: '/' });
+  const peerServer = PeerServer({ port: 5145, path: '/' });
   peerServer.on('connection', (client) => {
-    console.log(client, client.getId());
     const notification = new Notification();
     notification.title = `${client.getId()}成功连接`;
     notification.show();
@@ -88,14 +105,34 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1380,
-    height: 800,
+    width: isDebug ? 1380 : 375,
+    height: isDebug ? 800 : 400,
     icon: getAssetPath('icon.png'),
+    frame: false,
     webPreferences: {
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
+      allowRunningInsecureContent: true,
+      webSecurity: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
+  });
+
+  tray = new Tray(getAssetPath('icon.ico'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '退出',
+      click: () => {
+        app.quit();
+      },
+    },
+  ]);
+  tray.setToolTip('record');
+  tray.setContextMenu(contextMenu);
+  tray.on('click', () => {
+    mainWindow?.show();
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));

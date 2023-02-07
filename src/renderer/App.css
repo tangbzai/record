@@ -35,10 +35,9 @@ body {
 }
 
 .app {
+  -webkit-app-region: drag;
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
-  align-items: stretch;
   position: relative;
   height: 100vh;
   color: white;
@@ -50,6 +49,10 @@ body {
   );
   font-family: sans-serif;
   overflow-y: hidden;
+}
+
+.app *:not(div) {
+  -webkit-app-region: no-drag;
 }
 
 input {
@@ -104,14 +107,4 @@ a {
 a:hover {
   opacity: 1;
   text-decoration: none;
-}
-
-.Hello {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  margin: 20px auto;
-  width: 300px;
-  font-size: 1.3rem;
 }

@@ -1,0 +1,7 @@
+.nav {
+  padding: 8px 16px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  gap: 16px;
+}
