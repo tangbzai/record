@@ -14,21 +14,24 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v2
+      - name: Install Node.js and pnpm
+        # 注意这里使用pnpm而不是npm
+        uses: pnpm/action-setup@v2
         with:
-          node-version: 16
-          cache: npm
+          node-version: 20
+          # 更改为pnpm的缓存键
+          cache: 'pnpm'
+          # 安装pnpm版本
+          pnpm-version: latest
 
-      - name: npm install
+      - name: pnpm install
         run: |
-          npm install
+          pnpm install --frozen-lockfile
 
-      - name: npm test
+      - name: pnpm test
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run package
-          npm run lint
-          npm exec tsc
-          npm test
+          pnpm run package
+          pnpm run lint
+          pnpm test
