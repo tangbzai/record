@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
+        node-version: [20]
 
     steps:
       - name: Check out Git repository
@@ -16,9 +17,9 @@ jobs:
 
       - name: Install Node.js and pnpm
         # 注意这里使用pnpm而不是npm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 20
+          version: 9
           # 更改为pnpm的缓存键
           cache: 'pnpm'
           # 安装pnpm版本
