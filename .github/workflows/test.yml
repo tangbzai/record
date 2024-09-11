@@ -31,7 +31,7 @@ jobs:
       - name: pnpm install for Windows
         if: runner.os == 'Windows'
         run: |
-          pnpm run postinstall
+          pnpm install
         shell: pwsh
       - name: pnpm test
         env:
