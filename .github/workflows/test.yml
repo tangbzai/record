@@ -26,7 +26,7 @@ jobs:
           cache: 'pnpm'
       - name: pnpm install
         run: pnpm install --frozen-lockfile
-
+        shell: bash
       - name: pnpm test
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
