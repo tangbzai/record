@@ -13,21 +13,19 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
-
-      - name: Install Node.js and pnpm
+        uses: actions/checkout@v4
+      - name: Install pnpm
         # 注意这里使用pnpm而不是npm
         uses: pnpm/action-setup@v4
         with:
           version: 9
-          # 更改为pnpm的缓存键
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          # 安装pnpm版本
-          pnpm-version: latest
-
       - name: pnpm install
-        run: |
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: pnpm test
         env:
