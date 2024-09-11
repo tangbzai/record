@@ -19,7 +19,7 @@ export default function Index() {
       });
       return peer;
     },
-    [localIP]
+    [localIP],
   );
 
   useEffect(() => {
@@ -86,11 +86,10 @@ export default function Index() {
           return true;
         })
         .catch((e) => {
-          console.error('getSources Error:', e);
           showToast({ title: `getSources Error: ${e}` });
         });
     },
-    [connect]
+    [connect],
   );
 
   useEffect(() => {

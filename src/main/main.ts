@@ -42,8 +42,8 @@ function getLocalIP() {
     Object.values(OS.networkInterfaces())
       .find((network) =>
         network?.find(
-          (item) => item.family === 'IPv4' && item.address !== '127.0.0.1'
-        )
+          (item) => item.family === 'IPv4' && item.address !== '127.0.0.1',
+        ),
       )
       ?.find((item) => item.family === 'IPv4' && item.address !== '127.0.0.1')
       ?.address || ''
@@ -79,7 +79,7 @@ const installExtensions = async () => {
   return installer
     .default(
       extensions.map((name) => installer[name]),
-      forceDownload
+      forceDownload,
     )
     .catch(console.log);
 };

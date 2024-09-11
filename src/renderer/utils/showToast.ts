@@ -9,10 +9,13 @@ export default function showToast(options?: {
   toast.innerText = options?.title || '';
   toast.setAttribute(
     'style',
-    `animation-duration: ${(duration * 12) / 10000}s`
+    `animation-duration: ${(duration * 12) / 10000}s`,
   );
   body.appendChild(toast);
-  setTimeout(() => {
-    body.removeChild(toast);
-  }, (duration * 12) / 10);
+  setTimeout(
+    () => {
+      body.removeChild(toast);
+    },
+    (duration * 12) / 10,
+  );
 }

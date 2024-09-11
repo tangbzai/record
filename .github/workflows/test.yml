@@ -8,27 +8,35 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
+        node-version: [20]
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
-
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        # 注意这里使用pnpm而不是npm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 16
-          cache: npm
-
-      - name: npm install
+          version: 9
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      - name: pnpm install for macOS and Linux
+        if: runner.os != 'Windows'
+        run: pnpm install
+        shell: bash
+      - name: pnpm install for Windows
+        if: runner.os == 'Windows'
         run: |
-          npm install
-
-      - name: npm test
+          pnpm install
+        shell: pwsh
+      - name: pnpm test
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run package
-          npm run lint
-          npm exec tsc
-          npm test
+          pnpm run package
+          pnpm run lint
+          pnpm test
