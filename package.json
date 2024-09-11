@@ -22,7 +22,7 @@
   "author": "tangbzai",
   "main": "./.erb/dll/main.bundle.dev.js",
   "scripts": {
-    "build": "if %OS%==Windows_NT% (start /b pnpm run build:main & start /b pnpm run build:renderer) else (pnpm run build:main & pnpm run build:renderer)",
+    "build": "concurrently \"pnpm build:main\" \"pnpm build:renderer\"",
     "build:dll": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
