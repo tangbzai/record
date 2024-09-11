@@ -25,8 +25,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - name: pnpm install
-        run: pnpm install --frozen-lockfile
-        shell: bash
+        run: pnpm install
       - name: pnpm test
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
