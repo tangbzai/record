@@ -1,4 +1,5 @@
 {
+  "name": "record",
   "description": "A LAN audio transmission for desktop apps",
   "keywords": [
     "audio",
@@ -237,7 +238,8 @@
   "electronmon": {
     "patterns": [
       "!**/**",
-      "src/main/*"
+      "src/main/*",
+      ".erb/dll/**"
     ],
     "logLevel": "quiet"
   }
