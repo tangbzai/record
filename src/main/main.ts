@@ -178,14 +178,33 @@ app.on('window-all-closed', () => {
   }
 });
 
-app
-  .whenReady()
-  .then(() => {
-    createWindow();
-    app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
-    });
-  })
-  .catch(console.log);
+// 禁止双开
+const isFirstInstance = app.requestSingleInstanceLock();
+if (!isFirstInstance) {
+  setTimeout(() => {
+    app.quit();
+  }, 1000);
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    log.info('new app started, command:', commandLine);
+    if (mainWindow) {
+      mainWindow.show();
+      if (app.dock) {
+        app.dock.show();
+      }
+      mainWindow.focus();
+    }
+  });
+
+  app
+    .whenReady()
+    .then(() => {
+      createWindow();
+      app.on('activate', () => {
+        // On macOS it's common to re-create a window in the app when the
+        // dock icon is clicked and there are no other windows open.
+        if (mainWindow === null) createWindow();
+      });
+    })
+    .catch(console.log);
+}
