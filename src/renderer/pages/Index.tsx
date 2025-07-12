@@ -102,7 +102,6 @@ export default function Index() {
 
   return (
     <div className="index">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio />
       <div className="content">
         <span>IP&nbsp;:&nbsp;{localIP}</span>
