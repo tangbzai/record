@@ -7,11 +7,20 @@ body {
   padding: 0;
 }
 
-.__Toast__ {
+#_base_toast_box_ {
+  pointer-events: none;
   position: fixed;
   bottom: 10vh;
-  left: 50%;
-  transform: translateX(-50%);
+  display: flex;
+  flex-flow: column-reverse nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.__Toast__ {
+  margin: 0 auto;
   padding: 8px 10px;
   background: rgba(0, 0, 0, 0.3);
   color: white;

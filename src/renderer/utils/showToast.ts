@@ -1,8 +1,18 @@
+function getBaseToastBox() {
+  let toastBox = document.getElementById('_base_toast_box_');
+  if (!toastBox) {
+    toastBox = document.createElement('div');
+    toastBox.setAttribute('id', '_base_toast_box_');
+    document.body.appendChild(toastBox);
+  }
+  return toastBox;
+}
+
 export default function showToast(options?: {
   title?: string;
   duration?: number;
 }) {
-  const body = document.getElementsByTagName('body')[0];
+  const toastBox = getBaseToastBox();
   const duration = options?.duration || 1500;
   const toast = document.createElement('div');
   toast.setAttribute('class', '__Toast__');
@@ -11,10 +21,10 @@ export default function showToast(options?: {
     'style',
     `animation-duration: ${(duration * 12) / 10000}s`,
   );
-  body.appendChild(toast);
+  toastBox.appendChild(toast);
   setTimeout(
     () => {
-      body.removeChild(toast);
+      toastBox.removeChild(toast);
     },
     (duration * 12) / 10,
   );
