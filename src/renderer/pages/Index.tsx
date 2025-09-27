@@ -80,7 +80,7 @@ export default function Index() {
             },
           },
         } as any)
-        .then((stream: MediaStream) => {
+        .then((stream) => {
           stream.removeTrack(stream.getVideoTracks()[0]);
           peer.call(targetIP.replace(/\./g, '-'), stream);
           return true;
@@ -94,8 +94,8 @@ export default function Index() {
 
   useEffect(() => {
     const IPC = electron.ipcRenderer;
-    IPC.once('getIP', (LocalIP) => {
-      setLocalIP(LocalIP as string);
+    IPC.once('getIP', (LocalIP: string) => {
+      setLocalIP(LocalIP);
     });
     IPC.sendMessage('getIP', []);
   }, []);
