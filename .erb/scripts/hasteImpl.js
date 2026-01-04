@@ -1,5 +1,3 @@
-'use strict';
-
 const path = require('path');
 
 function getHasteName(filePath) {
