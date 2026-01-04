@@ -2,6 +2,7 @@
 import path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
+import { TextEncoder, TextDecoder } from 'node:util';
 import webpackPaths from '../configs/webpack.paths';
 
 const mainPath = path.join(webpackPaths.distMainPath, 'main.js');
@@ -26,8 +27,8 @@ if (!process.env.CI && !(process.env.NODE_ENV === 'test')) {
   }
 }
 
-// JSDOM does not implement TextEncoder and TextDecoder
 if (!global.TextEncoder) {
+  // @ts-ignore
   global.TextEncoder = TextEncoder;
 }
 if (!global.TextDecoder) {
