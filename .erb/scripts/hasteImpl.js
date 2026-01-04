@@ -7,7 +7,7 @@ function getHasteName(filePath) {
   if (filePath.endsWith(path.join('release', 'app', 'package.json'))) {
     return 'release-app-package';
   }
-  
+
   // 对于其他情况，返回默认的名称
   const name = path.basename(filePath);
   const ext = path.extname(name);
