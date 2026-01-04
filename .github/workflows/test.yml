@@ -48,6 +48,7 @@ jobs:
       - name: Run lint and unit tests
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: test
         run: |
           pnpm run lint
           pnpm test
