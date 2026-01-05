@@ -31,7 +31,10 @@ const configuration: webpack.Configuration = {
   module: require('./webpack.config.renderer.dev').default.module,
 
   entry: {
-    renderer: Object.keys(dependencies || {}),
+    renderer: Object.keys(dependencies || {}).filter(
+      (dependency) =>
+        !['electron', 'electron-builder', 'ts-node'].includes(dependency),
+    ),
   },
 
   output: {
