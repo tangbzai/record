@@ -21,7 +21,6 @@ import {
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import OS from 'os';
-import { PeerServer } from 'peer';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -88,6 +87,9 @@ const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
+
+  // 动态导入 peer 模块
+  const { PeerServer } = await import('peer');
   const peerServer = PeerServer({ port: 5145, path: '/' });
   peerServer.on('connection', (client) => {
     const notification = new Notification();
