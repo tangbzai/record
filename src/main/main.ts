@@ -49,9 +49,8 @@ function getLocalIP() {
   );
 }
 
-const loadIP = getLocalIP();
 ipcMain.on('getIP', async (event) => {
-  event.reply('getIP', loadIP);
+  event.reply('getIP', getLocalIP());
 });
 
 ipcMain.on('winHide', () => {
