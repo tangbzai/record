@@ -1,6 +1,6 @@
 name: Test
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          # 移除 setup-node 的缓存设置，因为已在 pnpm action 中设置
       - name: Get pnpm store path
         shell: bash
         run: echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
@@ -42,8 +41,7 @@ jobs:
         shell: bash
       - name: pnpm install for Windows
         if: runner.os == 'Windows'
-        run: |
-          pnpm install
+        run: pnpm install
         shell: pwsh
       - name: Run lint and unit tests
         env:
